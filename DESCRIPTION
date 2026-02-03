@@ -1,0 +1,41 @@
+Package: trabs
+Type: Package
+Title: Trait-abundance scaling toolbox
+Version: 0.0.1
+Authors@R: c(
+    person(given   = "Pierre",
+           family  = "Gaüzère",
+           role    = c("aut"),
+           email   = "pierre.gauzere@gmail.com",
+           comment = c(ORCID = "0000-0003-1259-6131")),
+    person(given   = "Romain",
+           family  = "Frelat",
+           role    = c("aut", "cre"),
+           email   = "rom.frelat@gmail.com",
+           comment = c(ORCID = "0000-0002-8631-4398")))
+Description: Calculations of trait-abundance scaling relationships.
+URL: https://github.com/FRBCesab/trabs
+BugReports: https://github.com/FRBCesab/trabs/issues
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+LazyDataCompression: xz
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends: 
+    R (>= 4.1.0)
+Imports: 
+    abind,
+    stats
+Suggests: 
+    covr,
+    devtools,
+    dplyr,
+    glue,
+    ggplot2,
+    pak,
+    plotly,
+    rdeps,
+    tidyr,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
