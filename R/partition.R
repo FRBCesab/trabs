@@ -8,8 +8,8 @@
 #' @param curves a `trasmout` data object
 #' @param conservative_ci calculate the confidence intervals
 #' @param add_percent calculate percentages
-#' @param eps threshold value
-#' @param long_format return long formatted data.frame
+#' @param eps threshold value for calculation percentages
+#' @param output format of the output, either "wide", "long", or "effect"
 #'
 #' @returns A `data.frame` with partition effects in long or wide format
 #'
@@ -24,13 +24,25 @@ partition <- function(
   conservative_ci = TRUE,
   add_percent = TRUE,
   eps = 1e-8,
-  long_format = FALSE
+  output = c("wide", "long", "effect")
 ) {
+  output <- match.arg(output, several.ok = FALSE)
+
+  # transformation to be moved in rarefy()
   ind_p <- grep("^p[1-9]", names(curves))
   p_order <- gsub("p", "", names(curves)[ind_p]) |> as.numeric() |> order()
   names(curves)[ind_p[p_order]] <- c("lo", "med", "hi")
+
+  stopifnot(
+    "`curves` must contain columns `N`, `ind`, `scn`, `med`, `lo`, `hi`" = {
+      all(c("N", "ind", "scn", "med", "lo", "hi") %in% names(curves))
+    }
+  )
+
+  keepC <- names(curves)[!names(curves) %in% c("scn", "lo", "med", "hi")]
   # to be checked : unique(curves$scn)
 
+  # check if duplicated rows before reshape
   wcur <- stats::reshape(
     curves,
     idvar = c("N", "ind"),
@@ -46,7 +58,7 @@ partition <- function(
   # )
 
   out <- data.frame(
-    wcur[, c(1:2, grep("med", names(wcur)))],
+    wcur[, c(keepC, grep("med", names(wcur), value = TRUE))],
     # simple effects
     "effect_covTA_med" = wcur$med.emp - wcur$med.null_Tr, # isolates T–A coupling
     "effect_SAD_med" = wcur$med.null_Tr - wcur$med.null_all, # restores SAD only (T random)
@@ -55,6 +67,7 @@ partition <- function(
   )
 
   if (conservative_ci) {
+    # confidence interval
     ci <- data.frame(
       "effect_covTA_lo" = wcur$lo.emp - wcur$hi.null_Tr,
       "effect_covTA_hi" = wcur$hi.emp - wcur$lo.null_Tr,
@@ -68,7 +81,7 @@ partition <- function(
     out <- cbind(out, ci)
   }
 
-  if (add_percent) {
+  if (add_percent & output != "effect") {
     is_emp_positive <- is.finite(wcur$med.emp) & abs(wcur$med.emp) > eps
     wcur$denom_emp = ifelse(is_emp_positive, wcur$med.emp, NA)
 
@@ -96,10 +109,11 @@ partition <- function(
     )
     out <- cbind(out, pct)
   }
-
-  if (long_format) {
-    var <- names(out)[-(1:2)]
-    out <- stats::reshape(
+  if (output == "wide") {
+    return(out)
+  } else {
+    var <- names(out)[!names(out) %in% keepC]
+    long <- stats::reshape(
       out,
       varying = var,
       v.names = "value",
@@ -108,13 +122,23 @@ partition <- function(
       direction = "long",
       idvar = c("N", "ind")
     )
-    # equivalent to tidyr pivot_longer
-    # out <- tidyr::pivot_longer(
-    #   out,
-    #   cols = var,
-    #   names_to = "effect",
-    #   values_to = "value"
-    # )
+    if (output == "long") {
+      return(long)
+    } else {
+      # select only the effect
+      effect <- long[grep("^effect_", long$partition), ]
+      # build new variables
+      effect$part <- second_str(effect$partition)
+      effect$level <- last_str(effect$partition)
+      # reshape to wide
+      w_effect <- stats::reshape(
+        effect[names(effect) != "partition"],
+        idvar = c("N", "ind", "part"),
+        timevar = "level",
+        direction = "wide",
+        v.names = "value"
+      )
+      return(w_effect)
+    }
   }
-  return(out)
 }

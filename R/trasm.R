@@ -75,16 +75,15 @@ new_trasm <- function(
 
 #' Calculate a short summary of the trasm data
 #'
-#' @param object `trasm` object
-#' @param ... left over
-#' @exportS3Method base::summary
-summary.trasm <- function(object, ...) {
+#' @param x `trasm` object
+#' @export
+summary_trasm <- function(x) {
   data.frame(
-    "S" = nodup(object$Sp[object$Ab > 0]),
-    "N" = sum(object$Ab),
-    "muT" = mean(object$Tr),
-    "sdT" = stats::sd(object$Tr),
-    beta_hat = stats::coef(stats::lm(log1p(object$Ab) ~ object$Tr))[2] |>
+    "S_tot" = nodup(x$Sp[x$Ab > 0]),
+    "N_tot" = sum(x$Ab),
+    "muT" = mean(x$Tr),
+    "sdT" = stats::sd(x$Tr),
+    beta_hat = stats::coef(stats::lm(log1p(x$Ab) ~ x$Tr))[2] |>
       unname()
   )
 }

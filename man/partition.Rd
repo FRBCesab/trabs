@@ -9,7 +9,7 @@ partition(
   conservative_ci = TRUE,
   add_percent = TRUE,
   eps = 1e-08,
-  long_format = FALSE
+  output = c("wide", "long", "effect")
 )
 }
 \arguments{
@@ -19,9 +19,9 @@ partition(
 
 \item{add_percent}{calculate percentages}
 
-\item{eps}{threshold value}
+\item{eps}{threshold value for calculation percentages}
 
-\item{long_format}{return long formatted data.frame}
+\item{output}{format of the output, either "wide", "long", or "effect"}
 }
 \value{
 A \code{data.frame} with partition effects in long or wide format

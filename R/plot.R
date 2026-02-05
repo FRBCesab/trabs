@@ -100,7 +100,7 @@ gplot_curves <- function(
 gplot_effects <- function(
   curves,
   indices = c("CWM", "sumT", "rangeT", "S"),
-  effects = c("covTA", "SAD", "traits"),
+  effects = c("covTA", "SAD", "traits", "SADflat"),
   show_ci = TRUE,
   palette = "Set1"
 ) {
@@ -113,23 +113,10 @@ gplot_effects <- function(
     curves$ind <- factor(curves$ind, levels = indices, ordered = TRUE)
   }
   # partition effects
-  curves_part <- partition(
+  w_effect <- partition(
     curves,
     conservative_ci = show_ci,
-    long_format = TRUE
-  )
-  # select only the effect
-  effect <- curves_part[grep("^effect_", curves_part$partition), ]
-  # build new variables
-  effect$part <- second_str(effect$partition)
-  effect$level <- last_str(effect$partition)
-  # reshape to wide
-  w_effect <- stats::reshape(
-    effect[names(effect) != "partition"],
-    idvar = c("N", "ind", "part"),
-    timevar = "level",
-    direction = "wide",
-    v.names = "value"
+    output = "effect"
   )
 
   w_effect <- w_effect[w_effect$part %in% effects, ]

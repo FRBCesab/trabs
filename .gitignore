@@ -7,3 +7,14 @@ trabs.Rproj
 
 # ignore dev file
 dev/
+inst/doc
+
+# analysis file
+analysis/data/
+
+# vignettes files
+vignettes/*.html
+vignettes/*.R
+vignettes/simulations.rds
+/doc/
+/Meta/

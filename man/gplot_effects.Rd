@@ -7,7 +7,7 @@
 gplot_effects(
   curves,
   indices = c("CWM", "sumT", "rangeT", "S"),
-  effects = c("covTA", "SAD", "traits"),
+  effects = c("covTA", "SAD", "traits", "SADflat"),
   show_ci = TRUE,
   palette = "Set1"
 )
