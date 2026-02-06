@@ -43,7 +43,9 @@ length(make_steps(m_use, n_points = 100, mode = step_scale))
 - similar to `vegan::rarefy()` function
 - to be optimized?
 
-
+### summary_trasw
+Should be weigthed indicators (weigthed mean and sd).
+same for beta_cov
 
 ## how to compute rarefaction curves efficiently?
 https://vegandevs.github.io/vegan/reference/rarefy.html

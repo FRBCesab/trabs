@@ -69,24 +69,45 @@ saveRDS(simu, "analysis/data/simulations_curves_effects.rds")
 
 ## Plot curves -----------------------------------------------------------------
 for (i in metrics) {
-  sub_curves <- simu$curves[simu$curves$ind == i & simu$curves$sad_k == 1, ]
+  sub_curves <- simu$curves[simu$curves$ind == i & simu$curves$trait_sd == 1, ]
 
   p <- ggplot(
     sub_curves,
-    aes(x = N, y = p50, group = interaction(rep, scn, trait_sd))
+    aes(x = N, y = p50, group = interaction(rep, scn))
   ) +
-    # geom_errorbar(aes(ymin = p10, ymax = p90, y = p50, colour = as.factor(sad_k))) +
-    # geom_ribbon(aes(ymin = p10, ymax = p90,y = p50, fill = as.factor(scn)), alpha = 0.1) +
     geom_line(aes(y = p50, col = as.factor(scn)), alpha = 0.5) +
     geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
-    # facet_wrap(~ metric, scales = "free_y", nrow = 1) +
     scale_x_log10() +
     labs(x = "Individuals sampled (m)", y = i) +
     facet_grid(
       sad_k ~ beta_cov,
       labeller = labeller(.rows = label_both, .cols = label_both)
     )
-  nameout <- paste0("simulations_curves_", i, ".png")
+  nameout <- paste0("simulations_curves_sad_", i, ".png")
+  ggsave(
+    p,
+    filename = here::here("analysis", "figures", nameout),
+    width = 8,
+    height = 6
+  )
+}
+
+for (i in metrics) {
+  sub_curves <- simu$curves[simu$curves$ind == i & simu$curves$sad_k == 1, ]
+
+  p <- ggplot(
+    sub_curves,
+    aes(x = N, y = p50, group = interaction(rep, scn))
+  ) +
+    geom_line(aes(y = p50, col = as.factor(scn)), alpha = 0.5) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+    scale_x_log10() +
+    labs(x = "Individuals sampled (m)", y = i) +
+    facet_grid(
+      trait_sd ~ beta_cov,
+      labeller = labeller(.rows = label_both, .cols = label_both)
+    )
+  nameout <- paste0("simulations_curves_traitsd_", i, ".png")
   ggsave(
     p,
     filename = here::here("analysis", "figures", nameout),
@@ -97,6 +118,36 @@ for (i in metrics) {
 
 
 ## Plot effects ---------------------------------------------------
+for (i in metrics) {
+  sub_effect <- simu$effects[
+    simu$effects$ind == i & simu$effects$trait_sd == 1,
+  ]
+
+  p <- ggplot(sub_effect) +
+    geom_line(aes(
+      x = N,
+      y = value.med,
+      group = as.factor(paste0(rep, part)),
+      colour = as.factor(part)
+    )) +
+    geom_hline(yintercept = 0, linetype = 2, colour = "black") +
+    facet_grid(
+      sad_k ~ beta_cov,
+      labeller = labeller(.rows = label_both, .cols = label_both)
+    ) +
+    scale_x_log10() +
+    labs(
+      x = "Individuals sampled (m)",
+      y = paste0("effect on ", i)
+    )
+  nameout <- paste0("simulations_effects_sad_", i, ".png")
+  ggsave(
+    p,
+    filename = here::here("analysis", "figures", nameout),
+    width = 8,
+    height = 6
+  )
+}
 
 for (i in metrics) {
   sub_effect <- simu$effects[simu$effects$ind == i & simu$effects$sad_k == 1, ]
@@ -122,7 +173,7 @@ for (i in metrics) {
       x = "Individuals sampled (m)",
       y = paste0("effect on ", i)
     )
-  nameout <- paste0("simulations_effects_", i, ".png")
+  nameout <- paste0("simulations_effects_traitsd_", i, ".png")
   ggsave(
     p,
     filename = here::here("analysis", "figures", nameout),
